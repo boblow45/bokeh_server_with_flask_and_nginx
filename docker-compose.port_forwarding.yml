@@ -1,0 +1,32 @@
+version: '2'
+services:
+  flask:
+    build: ./flask
+    image: flask
+    volumes:
+      - ./flask:/app
+    command: uwsgi --socket flask:5000 --wsgi-file app.py --callable app
+    environment:
+      BOKEH_URL: 'http://localhost:8081/bokeh'
+  bokeh:
+    build: ./bokeh
+    image: bokeh-serve
+    volumes:
+      - ./bokeh/sliders.py:/app/sliders.py
+    command: --address bokeh --prefix bokeh --host localhost:8081 --host localhost:80 sliders.py
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx/generate_conf:/tmp/generate_conf
+      - ./nginx/mysite.template:/etc/nginx/conf.d/mysite.template
+    ports:
+     - "8081:80"
+    environment:
+     - NGINX_HOST=nginx
+     - NGINX_PORT=80
+     - FLASK_UWSGI_PASS=flask:5000
+     - BOKEH_PROXY_PASS=http://bokeh:5006
+    command: /usr/bin/bash -c "/tmp/generate_conf && nginx -g 'daemon off;'"
+    links:
+      - flask:flask
+      - bokeh:bokeh
