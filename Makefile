@@ -67,8 +67,15 @@ else
 endif
 
 
-start_bokeh: ## Start and show bokeh website 
-	source venv/bin/activate
-	cd bokeh
-	bokeh serve --prefix bokeh --address localhost --port 5006 --num-procs 0 sliders.py
-	cd ..
+start: ## Start container
+	docker-compose up -d
+
+stop: ## Stop containers 
+	docker-compose down
+
+restart: ## Do a clean rebuild of containers
+	docker-compose down
+	docker rmi flask
+	docker rmi bokeh-serve
+	docker-compose build
+	docker-compose up -d
