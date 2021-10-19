@@ -8,5 +8,8 @@ url = os.environ['BOKEH_URL']
 
 @app.route('/')
 def index():
-    script = server_document(model=None, url=url, app_path="/sliders")
+
+    global url
+    url_path = str(url) + "/sliders"
+    script = server_document(url_path)
     return render_template('index.html', bokeh_script=script)

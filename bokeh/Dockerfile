@@ -13,12 +13,12 @@
 # ENTRYPOINT ["bokeh", "serve"]
 
 
-FROM python:latest
+FROM python:3.9.7
 
 RUN mkdir -p /app
 WORKDIR /app
 
-RUN pip install bokeh && pip install numpy
+RUN pip install bokeh==2.4.1 && pip install numpy==1.21.2
 
 # activate the bokeh environment
 # ENV PATH /opt/conda/envs/bokeh/bin:$PATH
