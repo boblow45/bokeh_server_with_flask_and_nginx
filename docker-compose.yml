@@ -20,7 +20,7 @@ services:
   nginx:
     image: nginx:1.21.3
     volumes:
-      - ./nginx/generate_conf:/tmp/generate_conf
+      - ./nginx/generate_conf.sh:/tmp/generate_conf.sh
       - ./nginx/mysite.template:/etc/nginx/conf.d/mysite.template
     ports:
       - "80:8081"
@@ -29,7 +29,7 @@ services:
       - NGINX_PORT=8081
       - FLASK_UWSGI_PASS=flask:5000
       - BOKEH_PROXY_PASS=http://bokeh:5006/bokeh
-    command: /bin/bash -c "/tmp/generate_conf && nginx -g 'daemon off;'"
+    command: /bin/bash -c "/tmp/generate_conf.sh && nginx -g 'daemon off;'"
     links:
       - flask:flask
       - bokeh:bokeh
