@@ -6,29 +6,27 @@ services:
     image: flask
     volumes:
       - ./flask:/app
-    command: uwsgi --socket flask:5000 --wsgi-file app.py --callable app
+    command: uwsgi --socket flask:${FLASK_PORT} --wsgi-file app.py --callable app
     environment:
-
-      # Need to be IP address of machine site is running on
-      BOKEH_URL: 'http://10.24.0.3:80/bokeh'
+      BOKEH_URL: 'http://${HOST_ADDRESS}:80/bokeh'
   bokeh:
     build: ./bokeh
     image: bokeh-serve
     volumes:
       - ./bokeh/sliders.py:/app/sliders.py
-    command: --prefix bokeh --address 0.0.0.0 --port 5006 --num-procs 0 --allow-websocket-origin=* sliders.py
+    command: --prefix bokeh --address 0.0.0.0 --port ${BK_PORT} --num-procs 0 --allow-websocket-origin=* sliders.py
   nginx:
     image: nginx:1.21.3
     volumes:
       - ./nginx/generate_conf.sh:/tmp/generate_conf.sh
       - ./nginx/mysite.template:/etc/nginx/conf.d/mysite.template
     ports:
-      - "80:8081"
+      - "80:${NGINX_PORT}"
     environment:
       - NGINX_HOST=nginx
-      - NGINX_PORT=8081
-      - FLASK_UWSGI_PASS=flask:5000
-      - BOKEH_PROXY_PASS=http://bokeh:5006/bokeh
+      - NGINX_PORT=${NGINX_PORT}
+      - FLASK_UWSGI_PASS=flask:${FLASK_PORT}
+      - BOKEH_PROXY_PASS=http://bokeh:${BK_PORT}/bokeh
     command: /bin/bash -c "/tmp/generate_conf.sh && nginx -g 'daemon off;'"
     links:
       - flask:flask

@@ -5,6 +5,6 @@ WORKDIR /app
 
 RUN pip install bokeh==2.4.1 && pip install numpy==1.21.2
 
-EXPOSE 5006
+EXPOSE ${BK_PORT}
 
 ENTRYPOINT ["bokeh", "serve"]
